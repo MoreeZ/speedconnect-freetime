@@ -9,7 +9,7 @@ const fs = require("fs");
 // const { body, validationResult } = require("express-validator");
 
 const app = express();
-const port = 3000;
+const port = 80;
 
 app.use(express.urlencoded({ extended: false }));
 
@@ -37,10 +37,12 @@ app.get("/:userName", async (req, res) => {
 
 app.post("/", jsonParser, async (req, res) => {
   try {
-    await addUser(req.body);
-    res.redirect("/" + req.body.name);
+    if(req.body.name && /^[A-Za-z\s]+$/.test(req.body.name)) {
+      await addUser(req.body);
+      res.redirect("/" + req.body.name);
+    } else throw new Error('Incorrect name. Try again');
   } catch (err) {
-    res.send(err);
+    res.send("Failed to add user:", err);
   }
 });
 
